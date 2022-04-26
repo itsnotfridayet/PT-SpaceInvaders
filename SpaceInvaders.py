@@ -7,7 +7,7 @@ from pygame import display
 from pygame import surface
 from pygame.constants import KEYDOWN
 from pygame.time import Clock
-from pygame.sprite import spritecollide
+from pygame.sprite import groupcollide, spritecollide
 from datetime import datetime
 import time
 
@@ -86,6 +86,21 @@ class Projectile(pygame.sprite.Sprite):
         if self.rect.centery < 0:
             self.kill()
 
+class EnemyProjectile(pygame.sprite.Sprite):
+    def __init__(self):
+        super(Projectile, self).__init__()
+        self.color = (0, 255, 0)
+        self.surf = pygame.Surface((15, 15))
+        self.surf.fill(self.color)
+        self.rect = self.surf.get_rect(center = (player.rect.center))
+        self.speed = PROJECTILESPEED
+        self.isAlien = False
+
+    def update(self):
+        self.rect.move_ip(0, -self.speed)
+        if self.rect.centery < 0:
+            self.kill()
+
 all_projectles = pygame.sprite.Group()
 
 class Alien(pygame.sprite.Sprite):
@@ -104,8 +119,16 @@ class Alien(pygame.sprite.Sprite):
             self.kill()
             playerscore += 1
 
-
-
+class Base(pygame.sprite.Sprite): # -s
+    def __init__(self):
+        super(Base, self).__init__()
+        self.surf = pygame.Surface((100, 20))
+        self.surf.fill((0, 255, 0))
+        self.rect = self.surf.get_rect(center = (5, 500))
+    
+    def update(self):
+        if pygame.sprite.spritecollide(self, alien_projectiles, True):
+            self.kill()
 
 ATTACK = pygame.USEREVENT + 1
 pygame.time.set_timer(ATTACK, random.randint(500, 5000))
@@ -119,15 +142,24 @@ alien_projectiles = pygame.sprite.Group()
 all_sprites.add(player)
 
 for i in range(NUMALIENSX):
-    new_alien = Alien()
-    new_alien.rect.center = (new_alien.rect.centerx + (((SCREEN_WIDTH/NUMALIENSX) - 0.54) * i), new_alien.rect.centery)
-    all_aliens.add(new_alien)
-    all_sprites.add(new_alien)
     for j in range(NUMALIENSY):
         new_alien = Alien()
         new_alien.rect.center = (new_alien.rect.centerx + (((SCREEN_WIDTH/NUMALIENSX) - 0.54) * i), new_alien.rect.centery + ((((SCREEN_HEIGHT/3)/NUMALIENSY) - 0.54) * j))
         all_aliens.add(new_alien)
         all_sprites.add(new_alien)
+
+# Draw the bases -s
+base1 = Base()
+base1.rect.center = (50, 600)
+all_sprites.add(base1)
+
+base2 = Base()
+base2.rect.center = (250, 600)
+all_sprites.add(base2)
+
+base3 = Base()
+base3.rect.center = (550, 600)
+all_sprites.add(base3)
 
 # -- Main Game Loop -- #
 
@@ -137,7 +169,11 @@ hit_left = True
 
 sidehits = 0
 
-# Set the initial time for the cooldown
+base1health = 3
+base2health = 3
+base3health = 3
+
+# Set the initial time for the cooldown -s
 lastprojectilelaunch = time.time()
 
 while running:
@@ -148,19 +184,20 @@ while running:
                 running = False
 
             if event.key == K_SPACE:
-                # Check if the cooldown time has passed
+                # Check if the cooldown time has passed -s
                 if time.time() - lastprojectilelaunch > COOLDOWN_TIME:
                     new_projectile = Projectile()
                     all_projectles.add(new_projectile)
                     all_sprites.add(new_projectile)
-                    # Set the current time for the cooldown
+                    # Set the current time for the cooldown -s
                     lastprojectilelaunch = time.time()
 
         elif event.type == QUIT:
             running = False
 
         elif event.type == ATTACK:
-            alien = all_aliens.sprites()[random.randint(1, len(all_aliens.sprites()))-1]
+##########################            alien = all_aliens.sprites()[random.randint(1, len(all_aliens.sprites()))-1]
+            alien = all_aliens.sprites()[1]
             alien_proj = Projectile()
             alien_proj.color = (255, 0, 0)
             alien_proj.rect.center = alien.rect.center
@@ -217,6 +254,34 @@ while running:
     if len(all_aliens.sprites()) == 0:
         running = False
 
+    if pygame.sprite.spritecollide(base1, alien_projectiles, True):
+        base1health += -1
+
+    if pygame.sprite.spritecollide(base2, alien_projectiles, True):
+        base2health += -1
+
+    if pygame.sprite.spritecollide(base3, alien_projectiles, True):
+        base3health += -1
+
+    if base1health < 1:
+        base1.kill()
+        base1.rect.center = (50, 1000)
+    else:
+        textsurf = mainfont.render(str(base1health),False, (255,255,255))
+        screen.blit(textsurf, (50,550))
+
+    if base2health < 1:
+        base2.kill()
+    else: 
+        textsurf = mainfont.render(str(base2health),False, (255,255,255))
+        screen.blit(textsurf, (250,550))
+
+    if base3health < 1:
+        base3.kill()
+    else:
+        textsurf = mainfont.render(str(base3health),False, (255,255,255))
+        screen.blit(textsurf, (550,550))
+
     textsurf = mainfont.render("SCORE: " + str(playerscore) ,False, (255,255,255))
     screen.blit(textsurf, (0,0))
 
@@ -226,4 +291,3 @@ while running:
     pygame.display.flip()
 
     clock.tick(FRAMERATE)
- 
