@@ -8,6 +8,8 @@ from pygame import surface
 from pygame.constants import KEYDOWN
 from pygame.time import Clock
 from pygame.sprite import spritecollide
+from datetime import datetime
+import time
 
 from pygame.locals import (
     K_LEFT,
@@ -35,6 +37,8 @@ PROJECTILESPEED = 8
 
 NUMALIENSX = 11
 NUMALIENSY = 5
+
+COOLDOWN_TIME = 0.5
 
 # -- Other Definitions -- #
 
@@ -98,7 +102,6 @@ class Alien(pygame.sprite.Sprite):
 
         if pygame.sprite.spritecollide(self, all_projectles, True):
             self.kill()
-            print("alien hit")
             playerscore += 1
 
 
@@ -134,8 +137,10 @@ hit_left = True
 
 sidehits = 0
 
-while running:
+# Set the initial time for the cooldown
+lastprojectilelaunch = time.time()
 
+while running:
     for event in pygame.event.get():
         if event.type == KEYDOWN:
 
@@ -143,9 +148,13 @@ while running:
                 running = False
 
             if event.key == K_SPACE:
-                new_projectile = Projectile()
-                all_projectles.add(new_projectile)
-                all_sprites.add(new_projectile)
+                # Check if the cooldown time has passed
+                if time.time() - lastprojectilelaunch > COOLDOWN_TIME:
+                    new_projectile = Projectile()
+                    all_projectles.add(new_projectile)
+                    all_sprites.add(new_projectile)
+                    # Set the current time for the cooldown
+                    lastprojectilelaunch = time.time()
 
         elif event.type == QUIT:
             running = False
@@ -217,3 +226,4 @@ while running:
     pygame.display.flip()
 
     clock.tick(FRAMERATE)
+ 
