@@ -1,14 +1,5 @@
-from ast import alias
-from math import trunc
-from os import truncate
 import pygame
 import random
-from pygame import display
-from pygame import surface
-from pygame.constants import KEYDOWN
-from pygame.time import Clock
-from pygame.sprite import groupcollide, spritecollide
-from datetime import datetime
 import time
 
 from pygame.locals import (
@@ -31,6 +22,7 @@ SCREEN_HEIGHT = 800
 FRAMERATE = 60
 
 FONT_SIZE = 30
+FONT_NAME = "Comic Sans MS"
 
 PLAYERSPEED = 5
 PROJECTILESPEED = 8
@@ -39,14 +31,6 @@ NUMALIENSX = 11
 NUMALIENSY = 5
 
 COOLDOWN_TIME = 0.5
-
-# -- Other Definitions -- #
-
-clock = pygame.time.Clock()
-screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-mainfont = pygame.font.SysFont('Consolas', FONT_SIZE)
-
-playerscore = 0
 
 # -- Class Definitions -- #
 
@@ -68,8 +52,6 @@ class Player(pygame.sprite.Sprite):
             self.rect.left = 0
         if self.rect.right > SCREEN_WIDTH:   
             self.rect.right = SCREEN_WIDTH
-
-player = Player()
 
 class Projectile(pygame.sprite.Sprite):
     def __init__(self):
@@ -100,8 +82,6 @@ class EnemyProjectile(pygame.sprite.Sprite):
         self.rect.move_ip(0, -self.speed)
         if self.rect.centery < 0:
             self.kill()
-
-all_projectles = pygame.sprite.Group()
 
 class Alien(pygame.sprite.Sprite):
     def __init__(self):
@@ -136,9 +116,18 @@ pygame.time.set_timer(ATTACK, random.randint(500, 5000))
 MOVEALIEN = pygame.USEREVENT + 2
 pygame.time.set_timer(MOVEALIEN, 2000)
 
+
+clock = pygame.time.Clock()
+screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+mainfont = pygame.font.SysFont(FONT_NAME, FONT_SIZE)
+
+playerscore = 0
+
+player = Player()
 all_sprites = pygame.sprite.Group()
 all_aliens = pygame.sprite.Group()
 alien_projectiles = pygame.sprite.Group()
+all_projectles = pygame.sprite.Group()
 all_sprites.add(player)
 
 for i in range(NUMALIENSX):
@@ -148,30 +137,27 @@ for i in range(NUMALIENSX):
         all_aliens.add(new_alien)
         all_sprites.add(new_alien)
 
-# Draw the bases -s
+# -- Draw the bases -- #-s
 base1 = Base()
 base1.rect.center = (75, 600)
 all_sprites.add(base1)
+base1health = 3
 
 base2 = Base()
 base2.rect.center = (300, 600)
 all_sprites.add(base2)
+base2health = 3
 
 base3 = Base()
 base3.rect.center = (525, 600)
 all_sprites.add(base3)
+base3health = 3
 
 # -- Main Game Loop -- #
 
 running = True
 hit_right = False
 hit_left = True
-
-sidehits = 0
-
-base1health = 3
-base2health = 3
-base3health = 3
 
 # Set the initial time for the cooldown -s
 lastprojectilelaunch = time.time()
