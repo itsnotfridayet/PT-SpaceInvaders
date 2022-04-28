@@ -22,7 +22,7 @@ SCREEN_HEIGHT = 800
 FRAMERATE = 60
 
 FONT_SIZE = 30
-FONT_NAME = "Comic Sans MS"
+FONT_NAME = "Consolas"
 
 PLAYERSPEED = 5
 PROJECTILESPEED = 8
@@ -99,7 +99,8 @@ class Alien(pygame.sprite.Sprite):
             self.kill()
             playerscore += 1
 
-class Base(pygame.sprite.Sprite): # -s
+# Class for bases -simon
+class Base(pygame.sprite.Sprite): 
     def __init__(self):
         super(Base, self).__init__()
         self.surf = pygame.Surface((100, 20))
@@ -121,7 +122,7 @@ clock = pygame.time.Clock()
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 mainfont = pygame.font.SysFont(FONT_NAME, FONT_SIZE)
 
-playerscore = 0
+playerscore = 00
 
 player = Player()
 all_sprites = pygame.sprite.Group()
@@ -137,10 +138,12 @@ for i in range(NUMALIENSX):
         all_aliens.add(new_alien)
         all_sprites.add(new_alien)
 
-# -- Draw the bases -- #-s
+# -- Draw the bases -- #-simon
+# Set the coordinates and add to the screen
 base1 = Base()
 base1.rect.center = (75, 600)
 all_sprites.add(base1)
+# Set the health
 base1health = 3
 
 base2 = Base()
@@ -159,7 +162,7 @@ running = True
 hit_right = False
 hit_left = True
 
-# Set the initial time for the cooldown -s
+# Set the initial time for the cooldown -simon
 lastprojectilelaunch = time.time()
 
 while running:
@@ -170,12 +173,12 @@ while running:
                 running = False
 
             if event.key == K_SPACE:
-                # Check if the cooldown time has passed -s
+                # Check if the cooldown time has passed -simon
                 if time.time() - lastprojectilelaunch > COOLDOWN_TIME:
                     new_projectile = Projectile()
                     all_projectles.add(new_projectile)
                     all_sprites.add(new_projectile)
-                    # Set the current time for the cooldown -s
+                    # Set the current time for the cooldown -simon
                     lastprojectilelaunch = time.time()
 
         elif event.type == QUIT:
@@ -239,15 +242,17 @@ while running:
     if len(all_aliens.sprites()) == 0:
         running = False
 
+    # Check if a base had a collision with an enemy projectile, if so then reduce its health
     if pygame.sprite.spritecollide(base1, alien_projectiles, True):
         base1health += -1
-
     if pygame.sprite.spritecollide(base2, alien_projectiles, True):
         base2health += -1
-
     if pygame.sprite.spritecollide(base3, alien_projectiles, True):
         base3health += -1
 
+    # Check if the bases have lost all their health. if so, kill it and move it off screen.
+    # If not, print the health above it. -simon
+    # Base 1
     if base1health < 1:
         base1.kill()
         base1.rect.center = (0, 1000)
@@ -255,6 +260,7 @@ while running:
         textsurf = mainfont.render(str(base1health),False, (255,255,255))
         screen.blit(textsurf, (70,550))
 
+    # Base 2
     if base2health < 1:
         base2.kill()
         base2.rect.center = (0, 1000)
@@ -262,6 +268,7 @@ while running:
         textsurf = mainfont.render(str(base2health),False, (255,255,255))
         screen.blit(textsurf, (295,550))
 
+    # Base 3
     if base3health < 1:
         base3.kill()
         base3.rect.center = (0, 1000)
@@ -270,7 +277,7 @@ while running:
         screen.blit(textsurf, (520,550))
 
     textsurf = mainfont.render("SCORE: " + str(playerscore) ,False, (255,255,255))
-    screen.blit(textsurf, (75,10))
+    screen.blit(textsurf, (225,10))
 
     textsurf2 = mainfont.render("ARROW KEYS: MOVE    SPACE: SHOOT",False, (255,255,255))
     screen.blit(textsurf2, (10,SCREEN_HEIGHT-50))
