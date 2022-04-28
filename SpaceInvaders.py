@@ -150,15 +150,15 @@ for i in range(NUMALIENSX):
 
 # Draw the bases -s
 base1 = Base()
-base1.rect.center = (50, 600)
+base1.rect.center = (75, 600)
 all_sprites.add(base1)
 
 base2 = Base()
-base2.rect.center = (250, 600)
+base2.rect.center = (300, 600)
 all_sprites.add(base2)
 
 base3 = Base()
-base3.rect.center = (550, 600)
+base3.rect.center = (525, 600)
 all_sprites.add(base3)
 
 # -- Main Game Loop -- #
@@ -196,8 +196,7 @@ while running:
             running = False
 
         elif event.type == ATTACK:
-##########################            alien = all_aliens.sprites()[random.randint(1, len(all_aliens.sprites()))-1]
-            alien = all_aliens.sprites()[1]
+            alien = all_aliens.sprites()[random.randint(1, len(all_aliens.sprites()))-1]
             alien_proj = Projectile()
             alien_proj.color = (255, 0, 0)
             alien_proj.rect.center = alien.rect.center
@@ -265,25 +264,27 @@ while running:
 
     if base1health < 1:
         base1.kill()
-        base1.rect.center = (50, 1000)
+        base1.rect.center = (0, 1000)
     else:
         textsurf = mainfont.render(str(base1health),False, (255,255,255))
-        screen.blit(textsurf, (50,550))
+        screen.blit(textsurf, (70,550))
 
     if base2health < 1:
         base2.kill()
+        base2.rect.center = (0, 1000)
     else: 
         textsurf = mainfont.render(str(base2health),False, (255,255,255))
-        screen.blit(textsurf, (250,550))
+        screen.blit(textsurf, (295,550))
 
     if base3health < 1:
         base3.kill()
+        base3.rect.center = (0, 1000)
     else:
         textsurf = mainfont.render(str(base3health),False, (255,255,255))
-        screen.blit(textsurf, (550,550))
+        screen.blit(textsurf, (520,550))
 
     textsurf = mainfont.render("SCORE: " + str(playerscore) ,False, (255,255,255))
-    screen.blit(textsurf, (0,0))
+    screen.blit(textsurf, (75,10))
 
     textsurf2 = mainfont.render("ARROW KEYS: MOVE    SPACE: SHOOT",False, (255,255,255))
     screen.blit(textsurf2, (10,SCREEN_HEIGHT-50))
