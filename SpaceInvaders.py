@@ -1,6 +1,9 @@
 import pygame
 import random
 import time
+import json
+from tkinter import *
+from tkinter import messagebox
 
 from pygame.locals import (
     K_LEFT,
@@ -13,6 +16,9 @@ from pygame.locals import (
 
 pygame.init()
 pygame.font.init()
+
+# -- Important file for storing high scores -- #
+DATA_FILE = ".\\highscore.json"
 
 # -- Constants -- #
 
@@ -121,7 +127,8 @@ clock = pygame.time.Clock()
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 mainfont = pygame.font.SysFont(FONT_NAME, FONT_SIZE)
 
-playerscore = 00
+playerscore = 0
+misses = 0
 player = Player()
 
 # Sprite Group Initialization, data structure creation -Jace Deshazer & Simon Wilch
@@ -157,6 +164,14 @@ base3 = Base()
 base3.rect.center = (525, 600)
 all_sprites.add(base3)
 base3health = 3
+
+# Ask the user for their name -Simon Wilch
+win = Tk()
+Label( win, text='First Name' ).grid( row=0 )
+fname = Entry( win )
+fname.grid( row=0, column=1 )
+Button( win, text='Okay', command=win.quit ).grid( row=3, column=0, sticky=W, pady=4 )
+mainloop()
 
 # -- Main Game Loop -- # Jace Deshazer & Simon Wilch
 
@@ -292,3 +307,17 @@ while running:
 
     pygame.display.flip()
     clock.tick(FRAMERATE)
+
+# Show the new high score if you got it -Simon Wilch
+# Load the file
+highscore = json.load(open(DATA_FILE))
+
+if playerscore > highscore["score"]:
+    message = ("Your score of " + str(playerscore) + " beat the high score of " + str(highscore["score"]) + "! Congrats!\n   Your score: " + str(playerscore) +  "\n   " + str(highscore["name"])+ "'s high score: " + str(highscore["score"]))
+    messagebox.showinfo("You did it!", message)
+    newhighscore = {}
+    newhighscore["score"] = playerscore
+    newhighscore["name"] = str(fname.get())
+    # Open the JSON file with the old highscore data and dump the new data
+    with open(DATA_FILE, 'w') as f:
+        json.dump(newhighscore, f)
