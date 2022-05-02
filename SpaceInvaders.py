@@ -18,22 +18,18 @@ pygame.font.init()
 
 SCREEN_WIDTH = 600
 SCREEN_HEIGHT = 800
-
 FRAMERATE = 60
-
 FONT_SIZE = 30
 FONT_NAME = "Consolas"
-
 PLAYERSPEED = 5
 PROJECTILESPEED = 8
-
 NUMALIENSX = 11
 NUMALIENSY = 5
-
 COOLDOWN_TIME = 0.5
 
 # -- Class Definitions -- #
 
+# Player class -Jace Deshazer
 class Player(pygame.sprite.Sprite):
     def __init__(self):
         super(Player, self).__init__()
@@ -53,6 +49,7 @@ class Player(pygame.sprite.Sprite):
         if self.rect.right > SCREEN_WIDTH:   
             self.rect.right = SCREEN_WIDTH
 
+# Player projectile class -Jace Deshazer
 class Projectile(pygame.sprite.Sprite):
     def __init__(self):
         super(Projectile, self).__init__()
@@ -68,6 +65,7 @@ class Projectile(pygame.sprite.Sprite):
         if self.rect.centery < 0:
             self.kill()
 
+# Enemy projectile class -Jace Deshazer
 class EnemyProjectile(pygame.sprite.Sprite):
     def __init__(self):
         super(Projectile, self).__init__()
@@ -82,7 +80,7 @@ class EnemyProjectile(pygame.sprite.Sprite):
         self.rect.move_ip(0, -self.speed)
         if self.rect.centery < 0:
             self.kill()
-
+# Alien class -Jace Deshazer
 class Alien(pygame.sprite.Sprite):
     def __init__(self):
         super(Alien, self).__init__()
@@ -99,7 +97,7 @@ class Alien(pygame.sprite.Sprite):
             self.kill()
             playerscore += 1
 
-# Class for bases -simon
+# Class for bases -Simon Wilch
 class Base(pygame.sprite.Sprite): 
     def __init__(self):
         super(Base, self).__init__()
@@ -111,6 +109,7 @@ class Base(pygame.sprite.Sprite):
         if pygame.sprite.spritecollide(self, alien_projectiles, True):
             self.kill()
 
+# Event creation -Jace Deshazer
 ATTACK = pygame.USEREVENT + 1
 pygame.time.set_timer(ATTACK, random.randint(500, 5000))
 
@@ -123,14 +122,16 @@ screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 mainfont = pygame.font.SysFont(FONT_NAME, FONT_SIZE)
 
 playerscore = 00
-
 player = Player()
+
+# Sprite Group Initialization, data structure creation -Jace Deshazer & Simon Wilch
 all_sprites = pygame.sprite.Group()
 all_aliens = pygame.sprite.Group()
 alien_projectiles = pygame.sprite.Group()
 all_projectles = pygame.sprite.Group()
 all_sprites.add(player)
 
+# Draw aliens and put them in a group -Jace Deshazer
 for i in range(NUMALIENSX):
     for j in range(NUMALIENSY):
         new_alien = Alien()
@@ -138,12 +139,13 @@ for i in range(NUMALIENSX):
         all_aliens.add(new_alien)
         all_sprites.add(new_alien)
 
-# -- Draw the bases -- #-simon
-# Set the coordinates and add to the screen
+# -- Draw the bases -- # -Simon Wilch
+
+# Set the coordinates and add to the screen -Simon Wilch
 base1 = Base()
 base1.rect.center = (75, 600)
 all_sprites.add(base1)
-# Set the health
+# Set the health -Simon Wilch
 base1health = 3
 
 base2 = Base()
@@ -156,13 +158,13 @@ base3.rect.center = (525, 600)
 all_sprites.add(base3)
 base3health = 3
 
-# -- Main Game Loop -- #
+# -- Main Game Loop -- # Jace Deshazer & Simon Wilch
 
 running = True
 hit_right = False
 hit_left = True
 
-# Set the initial time for the cooldown -simon
+# Set the initial time for the cooldown -Simon Wilch
 lastprojectilelaunch = time.time()
 
 while running:
@@ -173,12 +175,12 @@ while running:
                 running = False
 
             if event.key == K_SPACE:
-                # Check if the cooldown time has passed -simon
+                # Check if the cooldown time has passed -Simon Wilch
                 if time.time() - lastprojectilelaunch > COOLDOWN_TIME:
                     new_projectile = Projectile()
                     all_projectles.add(new_projectile)
                     all_sprites.add(new_projectile)
-                    # Set the current time for the cooldown -simon
+                    # Set the current time for the cooldown -Simon Wilch
                     lastprojectilelaunch = time.time()
 
         elif event.type == QUIT:
@@ -197,7 +199,8 @@ while running:
         elif event.type == MOVEALIEN:
             for alien in all_aliens:
                 if alien.rect.right >= SCREEN_WIDTH:
-                    
+
+                    # Loop through sprite group, check/update position -Jace Deshazer
                     for alien in all_aliens:
                         alien.rect.move_ip(0,2)
 
@@ -207,7 +210,7 @@ while running:
                     hit_right = True
 
                 if alien.rect.left <= 0:
-
+                    # Loop through sprite group, check/update position -Jace Deshazer
                     for alien in all_aliens:
                         alien.rect.move_ip(0,2)
 
@@ -217,15 +220,18 @@ while running:
                     hit_left = True
             
             if hit_right:
+                # Loop through sprite group and update position -Jace Deshazer
                 for alien in all_aliens:
                     alien.rect.move_ip(-5, 0)
 
             if hit_left:
+                # Loop through sprite group and update position -Jace Deshazer
                 for alien in all_aliens:
                     alien.rect.move_ip(5, 0)
     
     pressed_keys = pygame.key.get_pressed()
 
+    #Update Sprites
     player.update(pressed_keys)
     all_aliens.update()
     alien_projectiles.update()
@@ -251,8 +257,9 @@ while running:
         base3health += -1
 
     # Check if the bases have lost all their health. if so, kill it and move it off screen.
-    # If not, print the health above it. -simon
-    # Base 1
+    # If not, print the health above it. - Simon Wilch
+
+    # Base 1 -Simon Wilch
     if base1health < 1:
         base1.kill()
         base1.rect.center = (0, 1000)
@@ -260,7 +267,7 @@ while running:
         textsurf = mainfont.render(str(base1health),False, (255,255,255))
         screen.blit(textsurf, (70,550))
 
-    # Base 2
+    # Base 2 -Simon Wilch
     if base2health < 1:
         base2.kill()
         base2.rect.center = (0, 1000)
@@ -268,7 +275,7 @@ while running:
         textsurf = mainfont.render(str(base2health),False, (255,255,255))
         screen.blit(textsurf, (295,550))
 
-    # Base 3
+    # Base 3 -Simon Wilch
     if base3health < 1:
         base3.kill()
         base3.rect.center = (0, 1000)
@@ -276,6 +283,7 @@ while running:
         textsurf = mainfont.render(str(base3health),False, (255,255,255))
         screen.blit(textsurf, (520,550))
 
+    
     textsurf = mainfont.render("SCORE: " + str(playerscore) ,False, (255,255,255))
     screen.blit(textsurf, (225,10))
 
@@ -283,5 +291,4 @@ while running:
     screen.blit(textsurf2, (10,SCREEN_HEIGHT-50))
 
     pygame.display.flip()
-
     clock.tick(FRAMERATE)
